@@ -3,7 +3,14 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 export default function Dashboard() {
-  const [stats, setStats] = useState<unknown[]>([]);
+  const [stats, setStats] = useState<
+    {
+      name: string;
+      used: number;
+      max: number;
+      status: string;
+    }[]
+  >([]);
 
   useEffect(() => {
     async function calculateCapacity() {
