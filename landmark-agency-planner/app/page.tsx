@@ -4,9 +4,29 @@ export const dynamic = "force-dynamic";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
+type Project = {
+  id?: number;
+  name: string;
+  scripting_hours: number;
+  shooting_hours: number;
+  editing_hours: number;
+  audio_hours: number;
+  [key: string]: string | number | undefined;
+};
+
+type TeamBandwidth = {
+  team_name: string;
+  max_weekly_hours: number;
+};
+
+type TeamStat = TeamBandwidth & {
+  used: number;
+  status: string;
+};
+
 export default function Dashboard() {
-  const [stats, setStats] = useState<any[]>([]);
-  const [projects, setProjects] = useState<any[]>([]);
+  const [stats, setStats] = useState<TeamStat[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [name, setName] = useState("");
 
   async function refreshData() {
@@ -37,17 +57,15 @@ export default function Dashboard() {
   }
 
   async function addProject() {
-    const { error } = await supabase
-      .from("projects")
-      .insert([
-        {
-          name: name,
-          scripting_hours: 10,
-          shooting_hours: 10,
-          editing_hours: 10,
-          audio_hours: 10,
-        },
-      ]);
+    const { error } = await supabase.from("projects").insert([
+      {
+        name: name,
+        scripting_hours: 10,
+        shooting_hours: 10,
+        editing_hours: 10,
+        audio_hours: 10,
+      },
+    ]);
     if (error) alert("Error: " + error.message);
     else {
       setName("");
@@ -56,7 +74,10 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    refreshData();
+    const loadData = async () => {
+      await refreshData();
+    };
+    loadData();
   }, []);
 
   return (
